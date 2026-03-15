@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Client Car moves from bottom-left to center */
+@keyframes clientCarAnim {
+  0% { transform: translate(0, 0); }
+  70% { transform: translate(160px, -120px); }
+  100% { transform: translate(160px, -120px); }
+}
+
+/* Opposing Car moves from top-right to center */
+@keyframes opposingCarAnim {
+  0% { transform: translate(0,0); }
+  70% { transform: translate(-160px, 120px); }
+  100% { transform: translate(-160px, 120px); }
+}
+
+/* Impact Flash */
+@keyframes impactFlashAnim {
+  0% { opacity: 0; }
+  50% { opacity: 1; transform: scale(1.5); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+.animate-clientCar {
+  animation: clientCarAnim 3s ease-out forwards;
+}
+
+.animate-opposingCar {
+  animation: opposingCarAnim 3s ease-out forwards;
+}
+
+.animate-impactFlash {
+  animation: impactFlashAnim 3s ease-out forwards;
+}
+@keyframes clientCarAnim {
+  0% { transform: translateX(0); }
+  70% { transform: translateX(250px); }
+  100% { transform: translateX(250px); }
+}
+@keyframes opposingCarAnim {
+  0% { transform: translateX(0); }
+  70% { transform: translateX(-250px); }
+  100% { transform: translateX(-250px); }
+}
+@keyframes impactFlashAnim {
+  0% { opacity: 0; }
+  50% { opacity: 1; transform: scale(1.5); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.animate-clientCar { animation: clientCarAnim 3s ease-out forwards; position:absolute;}
+.animate-opposingCar { animation: opposingCarAnim 3s ease-out forwards; position:absolute;}
+.animate-impactFlash { animation: impactFlashAnim 3s ease-out forwards; }

@@ -54,3 +54,69 @@ resource "aws_lambda_function" "results_processor" {
   source_code_hash = data.archive_file.lambda_extractor_zip.output_base64sha256
   timeout          = 60
 }
+# Query Lambda
+data "archive_file" "lambda_query_zip" {
+  type        = "zip"
+  source_file = "${path.module}/lambda_query.py"
+  output_path = "${path.module}/lambda_query.zip"
+}
+
+resource "aws_lambda_function" "query_function" {
+  filename         = data.archive_file.lambda_query_zip.output_path
+  function_name    = "legal-query-function"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "lambda_query.lambda_handler"
+  runtime          = "python3.9"
+  source_code_hash = data.archive_file.lambda_query_zip.output_base64sha256
+  timeout          = 30
+}
+
+# API Gateway
+resource "aws_apigatewayv2_api" "legal_api" {
+  name          = "legal-case-api"
+  protocol_type = "HTTP"
+  
+  cors_configuration {
+    allow_origins = ["*"]
+    allow_methods = ["GET", "POST", "OPTIONS"]
+    allow_headers = ["*"]
+  }
+}
+
+# Lambda Integration
+resource "aws_apigatewayv2_integration" "lambda" {
+  api_id             = aws_apigatewayv2_api.legal_api.id
+  integration_type   = "AWS_PROXY"
+  integration_method = "POST"
+  integration_uri    = aws_lambda_function.query_function.arn
+  payload_format_version = "2.0"
+}
+
+# Route
+resource "aws_apigatewayv2_route" "get_case" {
+  api_id    = aws_apigatewayv2_api.legal_api.id
+  route_key = "GET /cases/{jobId}"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda.id}"
+}
+
+# Stage
+resource "aws_apigatewayv2_stage" "default" {
+  api_id      = aws_apigatewayv2_api.legal_api.id
+  name        = "$default"
+  auto_deploy = true
+}
+
+# Lambda Permission
+resource "aws_lambda_permission" "api_gateway" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.query_function.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_apigatewayv2_api.legal_api.execution_arn}/*/*"
+}
+
+# Output API endpoint
+output "api_endpoint" {
+  value = aws_apigatewayv2_api.legal_api.api_endpoint
+  description = "API Gateway endpoint URL"
+}
