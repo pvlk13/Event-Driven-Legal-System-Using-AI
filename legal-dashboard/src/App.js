@@ -6,4 +6,4 @@ function App() {
  return <CaseDashboard />;
 }
 
-export default App;
+export default withAuthenticator(App);
