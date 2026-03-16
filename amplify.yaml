@@ -3,13 +3,13 @@ frontend:
   phases:
     preBuild:
       commands:
-        - cd legal-dashboard
+        - cd Event-Driven-Legal-System-Using-AI/legal-dashboard
         - npm ci
     build:
       commands:
         - npm run build
   artifacts:
-    baseDirectory: legal-dashboard/build
+    baseDirectory: Event-Driven-Legal-System-Using-AI/legal-dashboard/build
   cache:
     paths:
       - node_modules/**/*
