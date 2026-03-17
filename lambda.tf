@@ -15,6 +15,33 @@ data "archive_file" "lambda_extractor_zip" {
   source_file = "${path.module}/lambda_function3.py"
   output_path = "${path.module}/lambda_extractor.zip"
 }
+# Lambda Step function
+data "archive_file" "start_sf_zip" {
+  type        = "zip"
+  source_file = "${path.module}/lambda_step.py"
+  output_path = "${path.module}/start_step_function.zip"
+}
+# Package send_retainer_email Lambda
+data "archive_file" "send_email_zip" {
+  type        = "zip"
+  source_file = "${path.module}/send_retainer_email.py"
+  output_path = "${path.module}/send_retainer_email.zip"
+}
+
+resource "aws_lambda_function" "start_step_function" {
+  filename         = data.archive_file.start_sf_zip.output_path
+  function_name    = "start-step-function"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "lambda_step.lambda_handler"
+  runtime          = "python3.9"
+  source_code_hash = data.archive_file.start_sf_zip.output_base64sha256
+
+  environment {
+    variables = {
+      STATE_MACHINE_ARN = aws_sfn_state_machine.retainer_workflow.arn
+    }
+  }
+}
 
 # the Function
 resource "aws_lambda_function" "legal_processor" {
@@ -114,9 +141,42 @@ resource "aws_lambda_permission" "api_gateway" {
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.legal_api.execution_arn}/*/*"
 }
+# DynamoDB streams
+resource "aws_lambda_event_source_mapping" "ddb_trigger" {
+  event_source_arn  = aws_dynamodb_table.legal_summaries.stream_arn
+  function_name     = aws_lambda_function.start_step_function.arn
+  starting_position = "LATEST"
+}
 
+# Arn for stepfunction
+
+resource "aws_sfn_state_machine" "retainer_workflow" {
+  name     = "retainer-workflow"
+  role_arn = aws_iam_role.step_function_role.arn
+  definition = file("step_function_definition.json")
+}
+
+resource "aws_lambda_function" "send_retainer_email" {
+  filename         = data.archive_file.send_email_zip.output_path
+  function_name    = "send_retainer_email"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "send_retainer_email.lambda_handler"
+  runtime          = "python3.9"
+  source_code_hash = data.archive_file.send_email_zip.output_base64sha256
+  timeout          = 60
+
+  environment {
+    variables = {
+      TABLE_NAME            = aws_dynamodb_table.legal_summaries.name
+      SENDER_EMAIL          = "legal@vijayalakshmi-kurra-porfolio.website"
+      OFFICE_CALENDLY_LINK  = "https://calendly.com/office-consultation"
+      VIRTUAL_CALENDLY_LINK = "https://calendly.com/virtual-consultation"
+    }
+  }
+}
 # Output API endpoint
 output "api_endpoint" {
   value = aws_apigatewayv2_api.legal_api.api_endpoint
   description = "API Gateway endpoint URL"
 }
+

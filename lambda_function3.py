@@ -40,10 +40,29 @@ Example: If Box 1 contains '11', the part is 'REAR_BUMPER'. If Box 1 contains '0
   "damage_locations": [
     {"part": "REAR", "severity": "severe", "damage_type": "point_of_impact"}
 ]
-PEOPLE:
-- Client: If PEDESTRIAN or BICYCLIST exists, they are client. Otherwise, DRIVER 1.
-- Opposing Party: The OTHER driver/pedestrian.
-- Extract: first_name, last_name, DOB, address, phone (if available)
+CLIENT IDENTIFICATION RULES (STRICT):
+
+Step 1: Identify ALL people and their roles:
+- BICYCLIST
+- PEDESTRIAN
+- DRIVER
+- OCCUPANT
+
+Step 2: Identify ALL vehicles mentioned and link them to a driver or owner.
+
+Step 3: Assign CLIENT strictly using:
+- Any BICYCLIST → client
+- Any PEDESTRIAN (no bicyclist) → client
+- DRIVER 1 → client
+- OCCUPANT only if no others
+
+After selecting CLIENT, extract:
+
+first_name  
+last_name  
+DOB  
+address  
+phone
 
 ACCIDENT DETAILS:
 - Accident Date: MM/DD/YYYY

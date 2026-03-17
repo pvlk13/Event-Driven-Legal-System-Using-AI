@@ -1,6 +1,6 @@
 
 
-# 3. Add basic logging permissions so you can see your summaries
+#  Add basic logging permissions so you can see your summaries
 resource "aws_iam_role_policy_attachment" "lambda_log" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"

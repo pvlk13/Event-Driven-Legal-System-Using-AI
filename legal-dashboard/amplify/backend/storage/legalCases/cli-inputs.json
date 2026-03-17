@@ -1,0 +1,10 @@
+{
+  "resourceName": "legalCases",
+  "tableName": "legalCases",
+  "partitionKey": {
+    "fieldName": "jobId",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

@@ -1,0 +1,16 @@
+{
+  "Comment": "Retainer workflow test",
+  "StartAt": "WaitForData",
+  "States": {
+    "WaitForData": {
+      "Type": "Wait",
+      "Seconds": 300,
+      "Next": "SendRetainerEmail"
+    },
+    "SendRetainerEmail": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:272183979798:function:send_retainer_email",
+      "End": true
+    }
+  }
+}

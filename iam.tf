@@ -202,5 +202,106 @@ resource "aws_iam_role_policy" "lambda_invoke_extractor" {
     ]
   })
 }
+# IAM for step function policy attaching to lambda role
+resource "aws_iam_role_policy" "lambda_step_function_policy" {
+  name = "lambda-stepfunction-policy"
+  role = aws_iam_role.lambda_role.id
 
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "states:StartExecution",
+        Resource = aws_sfn_state_machine.retainer_workflow.arn
+      }
+    ]
+  })
+}
 
+resource "aws_iam_role" "step_function_role" {
+  name = "step-function-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "states.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+# IAM step function permission to call Lambdas
+resource "aws_iam_role_policy" "step_function_policy" {
+  name = "step-function-lambda-policy"
+  role = aws_iam_role.step_function_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = "lambda:InvokeFunction",
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "lambda_ddb_stream_policy" {
+  name = "lambda-ddb-stream-policy"
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "dynamodb:GetRecords",
+          "dynamodb:GetShardIterator",
+          "dynamodb:DescribeStream",
+          "dynamodb:ListStreams"
+        ],
+        Resource = aws_dynamodb_table.legal_summaries.stream_arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "lambda_send_email_policy" {
+  name = "lambda-send-email-policy"
+  role = aws_iam_role.lambda_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem"
+        ],
+        Resource = aws_dynamodb_table.legal_summaries.arn
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject"
+        ],
+        Resource = "${aws_s3_bucket.legal_uploads.arn}/*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "ses:SendRawEmail"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}

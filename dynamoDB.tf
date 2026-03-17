@@ -17,4 +17,9 @@ resource "aws_dynamodb_table" "legal_summaries" {
     name = "client_last_name"
     type = "S"
   }
+
+  # DynamoDB streams
+  # ✅ ADD THIS to capture events from table
+  stream_enabled   = true
+  stream_view_type = "NEW_IMAGE"
 }
