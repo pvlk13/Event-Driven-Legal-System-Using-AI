@@ -40,29 +40,39 @@ Example: If Box 1 contains '11', the part is 'REAR_BUMPER'. If Box 1 contains '0
   "damage_locations": [
     {"part": "REAR", "severity": "severe", "damage_type": "point_of_impact"}
 ]
-CLIENT IDENTIFICATION RULES (STRICT):
+CLIENT IDENTIFICATION RULES (VERY IMPORTANT):
 
-Step 1: Identify ALL people and their roles:
+First identify all people in the report and classify each one as one of:
 - BICYCLIST
 - PEDESTRIAN
 - DRIVER
 - OCCUPANT
 
-Step 2: Identify ALL vehicles mentioned and link them to a driver or owner.
+Then choose the CLIENT using this strict priority:
 
-Step 3: Assign CLIENT strictly using:
-- Any BICYCLIST → client
-- Any PEDESTRIAN (no bicyclist) → client
-- DRIVER 1 → client
-- OCCUPANT only if no others
+1. If any BICYCLIST exists, the CLIENT MUST be the BICYCLIST.
+2. If no bicyclist exists but any PEDESTRIAN exists, the CLIENT MUST be the PEDESTRIAN.
+3. If neither bicyclist nor pedestrian exists, the CLIENT MUST be DRIVER 1.
+4. OCCUPANT can be the CLIENT only if no bicyclist, no pedestrian, and no driver is present.
 
-After selecting CLIENT, extract:
+STRICT RULES:
+- NEVER choose OCCUPANT if a BICYCLIST exists.
+- NEVER choose OCCUPANT if a PEDESTRIAN exists.
+- NEVER invent a motor vehicle for a bicyclist or pedestrian client.
+- If the client is a BICYCLIST or PEDESTRIAN, extract that person as the client and keep motor vehicle extraction separate.
 
-first_name  
-last_name  
-DOB  
-address  
-phone
+Examples:
+- If the report labels JOHN GRILLO as BICYCLIST, then JOHN GRILLO is the CLIENT even if drivers or occupants are listed elsewhere.
+- If the report labels someone as PEDESTRIAN, that person is the CLIENT unless a BICYCLIST is also present.
+
+Extract the selected CLIENT fields:
+- first_name
+- last_name
+- DOB
+- address
+- phone
+- type
+- description
 
 ACCIDENT DETAILS:
 - Accident Date: MM/DD/YYYY
@@ -340,4 +350,16 @@ def extract_legal_data(text):
         traceback.print_exc()
         return {}
 
+def enforce_client_rules(legal_data, full_text):
+    text = full_text.upper()
+
+    # Priority 1: Bicyclist
+    if "BICYCLIST" in text:
+        legal_data["client"]["type"] = "BICYCLIST"
+
+    # Priority 2: Pedestrian
+    elif "PEDESTRIAN" in text:
+        legal_data["client"]["type"] = "PEDESTRIAN"
+
+    return legal_data
     
