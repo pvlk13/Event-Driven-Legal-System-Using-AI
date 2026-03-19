@@ -1013,6 +1013,9 @@ https://<your-amplify-app-id>.amplifyapp.com
 
  - Scalable hosting for React applications
 
+ <img width="1708" height="694" alt="image" src="https://github.com/user-attachments/assets/dbe3b5ca-9ecd-4b7d-b424-3919ec2bbae4" />
+
+
  <img width="2098" height="1070" alt="image" src="https://github.com/user-attachments/assets/462a870e-7a05-4ebe-b336-186f765ab121" />
 
  <img width="2986" height="1674" alt="image" src="https://github.com/user-attachments/assets/78c87025-9ad8-433c-a980-c661614e88b7" />
