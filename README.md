@@ -941,4 +941,87 @@ pandas==2.0.0
 
 ---
 
+### 🚀 Frontend Deployment (AWS Amplify)
+
+The frontend for this project is deployed using AWS Amplify, enabling continuous deployment directly from the GitHub repository.
+
+### 🔧 Setup Overview
+
+ - Framework: React (Create React App)
+
+ - Deployment: AWS Amplify Hosting
+
+ - Source: GitHub repository
+
+ - Build configuration: amplify.yml
+
+### ⚙️ Amplify Build Configuration
+
+The project uses a custom build configuration to ensure proper dependency resolution:
+```
+version: 1
+applications:
+  - appRoot: legal-dashboard
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm install --legacy-peer-deps
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: build
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+```
+### 📁 Important Notes
+
+ - The frontend resides in:
+  ```
+  legal-dashboard/
+  ```
+ - The file aws-exports.js is required for Amplify configuration and must be committed to the repository.
+   ```
+   legal-dashboard/src/aws-exports.js
+   ```
+### 🔄 Continuous Deployment
+
+ - Amplify automatically deploys the application on every push to the main branch.
+
+Workflow:   
+ ```
+ GitHub Push → Amplify Build → Deploy → Live URL
+ ```
+### 🌐 Live Application
+
+Once deployed, the app is accessible at: 
+```
+https://<your-amplify-app-id>.amplifyapp.com
+```
+
+### 📌 Why Amplify?
+
+ - Fully managed CI/CD
+
+ - Automatic builds and deployments
+
+ - Seamless GitHub integration
+
+ - Scalable hosting for React applications
+
+ <img width="2098" height="1070" alt="image" src="https://github.com/user-attachments/assets/462a870e-7a05-4ebe-b336-186f765ab121" />
+
+ <img width="2986" height="1674" alt="image" src="https://github.com/user-attachments/assets/78c87025-9ad8-433c-a980-c661614e88b7" />
+
+ <img width="2730" height="1538" alt="image" src="https://github.com/user-attachments/assets/fe981836-046c-4d78-ba13-4d842d14298e" />
+
+
+
+
+   
+
 
