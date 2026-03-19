@@ -105,6 +105,7 @@ This is a fully event-driven serverless pipeline. Emails are ingested via SES an
 ---
 
 ## 📂 Project Structure
+```bash
 
 Event-Driven-Legal-System-Using-AI/
 │
@@ -144,17 +145,18 @@ Event-Driven-Legal-System-Using-AI/
 ├── logic.py
 ├── streamlit_app.py
 └── requirements.txt
-
+```
 ---
+
 
 ## 📘 File-by-File Purpose
 
 main.tf
-
+```
 provider "aws" {
     region = "us-east-1"
 }
-
+```
 Purpose:
 Sets the AWS provider region for the Terraform deployment.
 
