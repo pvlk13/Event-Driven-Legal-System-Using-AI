@@ -282,63 +282,10 @@ resource "aws_lambda_permission" "allow_sns_invoke" {
 }
 
 ```
-## 📡 Why Amazon SNS Is Used
+### 📡 SNS Topic (Textract Notifications)
 
-Amazon Textract operates asynchronously — it does not return results immediately after a document is submitted. Instead, it processes the document in the background and provides a `JobId`.
-
-### ❌ Initial Challenge
-
-Initially, the system attempted to handle Textract responses synchronously. However:
-
-- AWS Lambda cannot wait indefinitely for long-running jobs
-- Polling Textract for results leads to:
-  - Increased cost
-  - Inefficient compute usage
-  - Risk of timeouts
-
----
-
-### ✅ Solution: Event-Driven Messaging with SNS
-
-To solve this, the system uses **Amazon SNS (Simple Notification Service)**.
-
-When starting a Textract job, an SNS topic is provided as a notification channel. Once Textract completes processing:
-
-1. Textract publishes a message to the SNS topic
-2. SNS automatically triggers the next Lambda function
-3. The pipeline continues without waiting or polling
-
----
-
-### 🔄 Workflow
-
-```text
-Lambda → Textract → SNS → Lambda → Continue Processing
-```
-
----
-
-### 🎯 Benefits of Using SNS
-
-- ⚡ Eliminates polling and idle waiting
-- 🔗 Decouples system components
-- 📈 Enables scalable, parallel processing
-- 💰 Reduces compute cost
-- 🔁 Improves reliability with retry mechanisms
-
----
-
-### 🧠 Key Insight
-
-This pattern reflects real-world serverless architecture best practices:
-
-> "Don’t wait for results — react to events."
-
-SNS enables the system to remain fully event-driven, making it efficient, scalable, and production-ready.
-
-
-
-
-
-
+| 🔹 **Section** | 📖 **Description** |
+|--------------|------------------|
+| 🎯 **Purpose** | Creates the **Amazon SNS topic** used to receive completion notifications from **Amazon Textract** |
+| 💡 **Why It Matters** | Enables an **event-driven workflow** by automatically triggering the next Lambda function after OCR completes — eliminating polling, reducing cost, and improving scalability |
 
