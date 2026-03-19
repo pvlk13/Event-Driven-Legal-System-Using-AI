@@ -31,5 +31,6 @@ LexCipher automates the intake of legal documents (like police accident reports)
 ---
 
 ## 🏗️ Architecture
-<img width="2420" height="1654" alt="image" src="https://github.com/user-attachments/assets/f88c44a6-3976-4c6f-8a83-269109b0af73" />
+<img width="2476" height="1682" alt="image" src="https://github.com/user-attachments/assets/3f752f77-a26e-4c9d-b747-6c929d39647a" />
+
 
