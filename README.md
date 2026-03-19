@@ -1022,6 +1022,33 @@ https://<your-amplify-app-id>.amplifyapp.com
 
  <img width="2730" height="1538" alt="image" src="https://github.com/user-attachments/assets/fe981836-046c-4d78-ba13-4d842d14298e" />
 
+### ⚠️ Challenges & Solutions
+| #  | Challenge                                          | Root Cause                                | Solution                                                                     |
+| -- | -------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------- |
+| 1  | Lambda not triggering from S3                      | Wrong event filter (`.pdf` vs `.eml`)     | Updated S3 trigger to listen for `.eml` files and handled parsing correctly  |
+| 2  | Textract not processing PDFs                       | PDF not uploaded to S3 properly           | Extracted PDF from email and ensured it exists in S3 before calling Textract |
+| 3  | DynamoDB not fully populated                       | Async pipeline delay (Textract + Bedrock) | Introduced **Step Functions with 5-min wait** to ensure complete data        |
+| 4  | Duplicate / incorrect vehicle & pedestrian mapping | Weak extraction prompt logic              | Improved prompt with **strict role mapping (PEDESTRIAN, BICYCLIST, DRIVER)** |
+| 5  | Client and opposing vehicle confusion              | AI ambiguity in role linking              | Added **priority-based client selection logic** in prompt                    |
+| 6  | Wrong images for pedestrian/bicycle                | UI assumed vehicle always exists          | Added **conditional rendering + person/bicycle placeholder UI**              |
+| 7  | Missing original PDF in email Lambda               | PDF key not stored in DB                  | Stored `original_pdf_key` in **Lambda 1 → passed through pipeline**          |
+| 8  | Email not sending                                  | Missing SES config / env variables        | Added **Terraform env variables + SES permissions**                          |
+| 9  | Step Function not triggering                       | Missing IAM permissions                   | Added `states:StartExecution` permission to Lambda                           |
+| 10 | DynamoDB Stream not working                        | Missing stream IAM permissions            | Added `GetRecords`, `DescribeStream`, etc. permissions                       |
+| 11 | Step Function definition errors                    | Missing `Next` state / invalid ARN        | Fixed JSON definition and proper Lambda ARN mapping                          |
+| 12 | Lambda import errors (`os not defined`)            | Missing imports                           | Added required Python imports (`import os`)                                  |
+| 13 | Multiple PDF uploads causing conflicts             | No orchestration                          | Used **Step Functions → each job runs independently**                        |
+| 14 | Amplify build failing (dependency conflict)        | React + TypeScript mismatch               | Used `npm install --legacy-peer-deps`                                        |
+| 15 | Amplify build failing (`aws-exports` missing)      | File ignored by Git                       | Forced commit of `aws-exports.js`                                            |
+| 16 | Git push rejected                                  | Local branch behind remote                | Used `git pull --rebase` before pushing                                      |
+| 17 | Lambda not triggering at all                       | Misconfigured S3 notifications            | Verified event mapping + permissions                                         |
+| 18 | Wrong damage visualization in UI                   | Poor normalization logic                  | Improved `normalizePart()` mapping logic                                     |
+| 19 | Vehicle shown for pedestrian cases                 | UI assumption issue                       | Added `isClientHuman` condition in React                                     |
+| 20 | Plate number confusion (same for both)             | AI extraction inconsistency               | Strengthened prompt to separate **client vs opposing vehicle**               |
+| 21 | Step Function confusion                            | Lack of orchestration understanding       | Used Step Functions for **delay + reliability + scaling**                    |
+| 22 | Handling bulk uploads                              | Sequential processing concern             | Step Functions enabled **parallel independent executions**                   |
+| 23 | Frontend only working on localhost                 | Not deployed                              | Used **AWS Amplify for CI/CD deployment**                                    |
+| 24 | Understanding architecture flow                    | Complex event-driven system               | Created **visual architecture diagram (draw.io + AWS icons)**                |
 
 
 
