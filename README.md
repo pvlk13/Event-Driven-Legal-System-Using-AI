@@ -102,5 +102,66 @@ The processed case can be viewed via:
 <img width="2476" height="1682" alt="image" src="https://github.com/user-attachments/assets/3f752f77-a26e-4c9d-b747-6c929d39647a" />
 This is a fully event-driven serverless pipeline. Emails are ingested via SES and stored in S3. A Lambda function extracts PDFs and triggers Textract for OCR. Once processing completes, SNS triggers downstream Lambdas for AI-based data extraction using Bedrock, which is stored in DynamoDB. A Step Function orchestrates delayed workflows like sending retainer emails. The frontend interacts via API Gateway to fetch processed case data
 
+---
+
+## 📂 Project Structure
+
+Event-Driven-Legal-System-Using-AI/
+│
+├── lambda/
+│   ├── lambda.tf
+│   ├── lambda_function.py
+│   ├── lambda_function2.py
+│   ├── lambda_function3.py
+│   ├── lambda_query.py
+│   ├── lambda_step.py
+│   ├── lambda_function.zip
+│   ├── lambda_extractor.zip
+│   ├── lambda_query.zip
+│
+├── legal-dashboard/
+│   ├── amplify/
+│   ├── public/
+│   ├── src/
+│   ├── package.json
+│   └── README.md
+│
+├── retainer_email/
+│   ├── send_retainer_email.py
+│   └── send_retainer_email.zip
+│
+├── s3/
+│   └── s3bucket.tf
+│
+├── step_function/
+│   ├── step_function_definition.json
+│   └── start_step_function.zip
+│
+├── dynamoDB.tf
+├── ses.tf
+├── sns.tf
+├── main.tf
+├── logic.py
+├── streamlit_app.py
+└── requirements.txt
+
+---
+
+## 📘 File-by-File Purpose
+
+main.tf
+
+provider "aws" {
+    region = "us-east-1"
+}
+
+Purpose:
+Sets the AWS provider region for the Terraform deployment.
+
+Why it matters:
+This is the Terraform entry point that establishes the base cloud configuration.
+
+
+
 
 
