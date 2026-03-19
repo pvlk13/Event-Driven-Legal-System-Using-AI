@@ -163,6 +163,181 @@ Sets the AWS provider region for the Terraform deployment.
 Why it matters:
 This is the Terraform entry point that establishes the base cloud configuration.
 
+dynamoDB.tf
+```
+resource "aws_dynamodb_table" "legal_summaries" {
+  name           = "legal-document-summaries"
+  billing_mode   = "PAY_PER_REQUEST"
+  hash_key       = "jobId"
+  
+  attribute {
+    name = "jobId"
+    type = "S"
+  }
+  global_secondary_index {
+    name            = "ClientIndex"
+    hash_key        = "client_last_name"
+    projection_type = "ALL"
+  }
+  
+  attribute {
+    name = "client_last_name"
+    type = "S"
+  }
+
+  # DynamoDB streams
+  #  ADD THIS to capture events from table
+  stream_enabled   = true
+  stream_view_type = "NEW_IMAGE"
+}
+```
+Purpose:
+Creates the DynamoDB table used to store processed legal case summaries.
+
+Why it matters:
+This table is the core storage layer for all extracted case information.
+
+ses.tf 
+
+```
+#ses domain identity
+# 1. Create the "Box" (Rule Set)
+resource "aws_ses_receipt_rule_set" "main" {
+  rule_set_name = "primary-ruleset"
+}
+
+# 2. Tell AWS: "This is the box I am currently using"
+resource "aws_ses_active_receipt_rule_set" "main" {
+  rule_set_name = aws_ses_receipt_rule_set.main.rule_set_name
+}
+resource "aws_ses_domain_identity" "legal_domain"{
+    domain = "vijayalakshmi-kurra-porfolio.website"
+}
+# receipt rule
+resource "aws_ses_receipt_rule" "storage_email" {
+  name = "store-to-s3"
+  rule_set_name = aws_ses_active_receipt_rule_set.main.rule_set_name
+  recipients = [
+    "legal@vijayalakshmi-kurra-porfolio.website",
+    "intake@vijayalakshmi-kurra-porfolio.website",
+    "claims@vijayalakshmi-kurra-porfolio.website"
+  ]
+  enabled = true
+  scan_enabled = true
+
+  s3_action {
+    bucket_name = aws_s3_bucket.legal_uploads.id
+    position = 1
+  }
+}
+
+```
+Purpose:
+Configures Amazon SES receipt rule sets for handling incoming emails.
+
+Why it matters:
+This is the email intake entry point of the whole workflow.
+
+sns.tf
+
+```
+# 1. Create the SNS Topic
+resource "aws_sns_topic" "textract_notifications" {
+  name = "AmazonTextract-LegalSummaries"
+}
+
+# 2. Allow Textract to publish to this topic
+resource "aws_sns_topic_policy" "default" {
+  arn = aws_sns_topic.textract_notifications.arn
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowTextractToPublish"
+        Effect = "Allow"
+        Principal = {
+          Service = "textract.amazonaws.com"
+        }
+        Action   = "sns:Publish"
+        Resource = aws_sns_topic.textract_notifications.name
+      }
+    ]
+  })
+}
+# Link SNS to Lambda
+resource "aws_sns_topic_subscription" "textract_to_lambda" {
+  topic_arn = aws_sns_topic.textract_notifications.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.results_processor.arn # Your new Lambda B
+}
+
+# Give SNS permission to invoke the Lambda
+resource "aws_lambda_permission" "allow_sns_invoke" {
+  statement_id  = "AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.results_processor.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.textract_notifications.arn
+}
+
+```
+## 📡 Why Amazon SNS Is Used
+
+Amazon Textract operates asynchronously — it does not return results immediately after a document is submitted. Instead, it processes the document in the background and provides a `JobId`.
+
+### ❌ Initial Challenge
+
+Initially, the system attempted to handle Textract responses synchronously. However:
+
+- AWS Lambda cannot wait indefinitely for long-running jobs
+- Polling Textract for results leads to:
+  - Increased cost
+  - Inefficient compute usage
+  - Risk of timeouts
+
+---
+
+### ✅ Solution: Event-Driven Messaging with SNS
+
+To solve this, the system uses **Amazon SNS (Simple Notification Service)**.
+
+When starting a Textract job, an SNS topic is provided as a notification channel. Once Textract completes processing:
+
+1. Textract publishes a message to the SNS topic
+2. SNS automatically triggers the next Lambda function
+3. The pipeline continues without waiting or polling
+
+---
+
+### 🔄 Workflow
+
+```text
+Lambda → Textract → SNS → Lambda → Continue Processing
+```
+
+---
+
+### 🎯 Benefits of Using SNS
+
+- ⚡ Eliminates polling and idle waiting
+- 🔗 Decouples system components
+- 📈 Enables scalable, parallel processing
+- 💰 Reduces compute cost
+- 🔁 Improves reliability with retry mechanisms
+
+---
+
+### 🧠 Key Insight
+
+This pattern reflects real-world serverless architecture best practices:
+
+> "Don’t wait for results — react to events."
+
+SNS enables the system to remain fully event-driven, making it efficient, scalable, and production-ready.
+
+
+
 
 
 
