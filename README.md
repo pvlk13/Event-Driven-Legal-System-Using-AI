@@ -1022,6 +1022,12 @@ https://<your-amplify-app-id>.amplifyapp.com
 
  <img width="2730" height="1538" alt="image" src="https://github.com/user-attachments/assets/fe981836-046c-4d78-ba13-4d842d14298e" />
 
+ <img width="1966" height="1130" alt="image" src="https://github.com/user-attachments/assets/7ccabda8-380c-4154-933f-4fcc2f6043ad" />
+
+ <img width="1996" height="710" alt="image" src="https://github.com/user-attachments/assets/ee05eb35-c213-4b5f-b7e7-601b0c471e78" />
+
+
+
 ### ⚠️ Challenges & Solutions
 | #  | Challenge                                          | Root Cause                                | Solution                                                                     |
 | -- | -------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------- |
@@ -1050,7 +1056,55 @@ https://<your-amplify-app-id>.amplifyapp.com
 | 23 | Frontend only working on localhost                 | Not deployed                              | Used **AWS Amplify for CI/CD deployment**                                    |
 | 24 | Understanding architecture flow                    | Complex event-driven system               | Created **visual architecture diagram (draw.io + AWS icons)**                |
 
+### 💡 Key Learnings
 
+ - Event-driven systems require proper orchestration (Step Functions)
+
+ - AI extraction accuracy depends heavily on prompt engineering
+
+ - Frontend must handle real-world edge cases (not just happy path)
+
+ - CI/CD pipelines (Amplify) require repo completeness (no missing files)
+
+### 🔐 Environment Variables
+# Lambda
+
+   - TABLE_NAME
+
+   - PDF_BUCKET
+
+   - SENDER_EMAIL
+
+   - OFFICE_CALENDLY_LINK
+
+   - VIRTUAL_CALENDLY_LINK
+
+### 🧪 Testing
+
+  - Send email with PDF attachment to SES email
+
+  - Wait for processing (~5 mins)
+
+  - Open dashboard and search by jobId
+
+### 📈 Future Improvements
+
+  🔍 Confidence scoring for AI extraction
+
+  📂 Multi-document support
+
+  📊 Analytics dashboard
+
+  🤖 Fine-tuned legal LLM
+
+  🖼️ Real image extraction instead of placeholders
+
+### 👩‍💻 Author
+
+   Vijayalakshmi Kurra  
+    
+
+  
 
    
 
