@@ -1091,17 +1091,17 @@ https://<your-amplify-app-id>.amplifyapp.com
 
   🔍 Confidence scoring for AI extraction
 
-  📂 Multi-document support
+      📂 Multi-document support
 
-  📊 Analytics dashboard
+      📊 Analytics dashboard
 
-  🤖 Fine-tuned legal LLM
+      🤖 Fine-tuned legal LLM
 
-  🖼️ Real image extraction instead of placeholders
+      🖼️ Real image extraction instead of placeholders
 
 ### 👩‍💻 Author
 
-   Vijayalakshmi Kurra  
+      Vijayalakshmi Kurra  
     
 
   
