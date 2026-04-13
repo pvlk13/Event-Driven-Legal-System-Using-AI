@@ -97,6 +97,11 @@ The processed case can be viewed via:
 - 📊 Streamlit
 
 ---
+## 🔥 From Email to Insight: Event-Driven Legal AI Pipeline
+
+![Image](https://github.com/user-attachments/assets/cd36d21c-9348-41ac-af7b-51717f24a3a4)
+
+---
 
 ## 🏗️ Architecture
 <img width="2476" height="1682" alt="image" src="https://github.com/user-attachments/assets/3f752f77-a26e-4c9d-b747-6c929d39647a" />
